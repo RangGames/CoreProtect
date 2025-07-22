@@ -6,7 +6,9 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
+import net.coreprotect.api.ChestAPI;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -104,6 +106,20 @@ public class CoreProtectAPI extends Queue {
             return BlockAPI.performLookup(block, time);
         }
         return null;
+    }
+
+    public List<String[]> chestLookup(Block block, int time) {
+        if (isEnabled()) {
+            return ChestAPI.performLookup(block, time);
+        }
+        return null;
+    }
+
+    public CompletableFuture<List<String[]>> chestLookupAsync(Block block, int time) {
+        if (!isEnabled()) {
+            return CompletableFuture.completedFuture(new ArrayList<>());
+        }
+        return ChestAPI.performLookupAsync(block, time);
     }
 
     /**

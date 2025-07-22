@@ -2,6 +2,7 @@ package net.coreprotect.api.result;
 
 import java.util.Locale;
 
+import net.coreprotect.database.rollback.Rollback;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.block.data.BlockData;
@@ -11,6 +12,7 @@ import net.coreprotect.utility.EntityUtils;
 import net.coreprotect.utility.MaterialUtils;
 import net.coreprotect.utility.StringUtils;
 import net.coreprotect.utility.WorldUtils;
+import org.bukkit.inventory.ItemStack;
 
 public class ParseResult {
     private final String[] parse;
@@ -51,6 +53,31 @@ public class ParseResult {
         }
 
         return result;
+    }
+
+    public int getAmount() {
+        if (parse.length > 10) {
+            return Integer.parseInt(parse[10]);
+        }
+        return 0;
+    }
+
+    public ItemStack getItemStack() {
+        if (parse.length > 11) {
+            try {
+                int type = Integer.parseInt(parse[5]);
+                int amount = getAmount();
+                byte[] metadata = parse[11].getBytes(java.nio.charset.StandardCharsets.ISO_8859_1);
+                ItemStack itemStack = new ItemStack(net.coreprotect.utility.MaterialUtils.getType(type), amount);
+                if (metadata.length > 0) {
+                    Object[] populatedStack = Rollback.populateItemStack(itemStack, metadata);
+                    itemStack = (ItemStack) populatedStack[2];
+                }
+                return itemStack;
+            } catch (Exception e) {
+            }
+        }
+        return null;
     }
 
     @Deprecated
